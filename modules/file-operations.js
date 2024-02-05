@@ -47,10 +47,10 @@ function rn(data) {
     const dirName = dirname(path);
     const newPath = resolve(dirName, newFileName);
     stat(path, (err) => {
+      // todo: change console logs
       if (err) console.log('Wrong input Wrong path');
       stat(newPath, (err) => {
         if (!err) console.log('Wrong input New path exists');
-        // console.log(path, newPath, data, paths);
         rename(path, newPath, (err) => {
           if (err) console.log('Wrong input Rename problem');
           showCurrentDirectory();
