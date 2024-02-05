@@ -8,30 +8,32 @@ function compress(data) {
   const paths = data?.split(' ');
   if (paths?.length !== 2) {
     onInputError();
+    showCurrentDirectory();
   } else {
     const src = createReadStream(resolve(paths[0]));
     const dst = createWriteStream(resolve(paths[1]));
     const brotliCompress = createBrotliCompress();
     pipeline(src, brotliCompress, dst, (err) => {
       if (err) onOperationFailed();
+      showCurrentDirectory();
     });
   }
-  showCurrentDirectory();
 }
 
 function decompress(data) {
   const paths = data?.split(' ');
   if (paths?.length !== 2) {
     onInputError();
+    showCurrentDirectory();
   } else {
     const src = createReadStream(resolve(paths[0]));
     const dst = createWriteStream(resolve(paths[1]));
     const brotliDecompress = createBrotliDecompress();
     pipeline(src, brotliDecompress, dst, (err) => {
       if (err) onOperationFailed();
+      showCurrentDirectory();
     });
   }
-  showCurrentDirectory();
 }
 
 export const zip = { compress, decompress };

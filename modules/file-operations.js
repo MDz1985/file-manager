@@ -1,5 +1,5 @@
 import { createReadStream, createWriteStream, rename, stat, writeFile, rm as rem } from 'node:fs';
-import { onInputError, showCurrentDirectory } from '../services/file-manager-service.js';
+import { onInputError, onOperationFailed, showCurrentDirectory } from '../services/file-manager-service.js';
 import { basename, dirname, resolve } from 'node:path';
 import { cwd } from 'node:process';
 
@@ -92,21 +92,23 @@ function copyFile({ paths, remove }) {
     writeStream.end();
   });
   readStream.on('error', () => {
-    console.log('Wrong input read problem');
+    onOperationFailed();
     showCurrentDirectory();
   });
-  writeStream.on('error', (err) => {
-    console.log('Wrong input write problem', err.message);
+  writeStream.on('error', () => {
+    onOperationFailed()
     showCurrentDirectory();
   });
 
   writeStream.on('finish', () => {
     if (remove) {
       rem(path, (err) => {
-        if (err) console.log(err);
+        if (err) onOperationFailed();
+        showCurrentDirectory();
       });
+    } else {
+      showCurrentDirectory();
     }
-    showCurrentDirectory();
   });
 }
 
@@ -116,13 +118,14 @@ function rm(path) {
   } else {
     stat(path, (err) => {
       if (err) {
-        onInputError();
+        onOperationFailed()
+        showCurrentDirectory();
       } else {
         rem(path, (err) => {
-          if (err) onInputError();
+          if (err) onOperationFailed();
+          showCurrentDirectory();
         });
       }
-      showCurrentDirectory();
     });
   }
 }
