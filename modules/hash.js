@@ -5,6 +5,7 @@ import { onInputError, onOperationFailed, showCurrentDirectory } from '../servic
 export function hash(path) {
   if (!path || path.includes(' ')) {
     onInputError();
+    showCurrentDirectory();
   } else {
     const hash = createHash('sha256');
     const readStream = createReadStream(path);
@@ -14,6 +15,9 @@ export function hash(path) {
         console.log(result.digest('hex'));
         showCurrentDirectory();
       })
-      .on('error', () => onOperationFailed());
+      .on('error', () => {
+        onOperationFailed();
+        showCurrentDirectory();
+      });
   }
 }

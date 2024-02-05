@@ -15,7 +15,7 @@ function cat(path) {
       showCurrentDirectory();
     });
     readStream.on('error', () => {
-      onInputError();
+      onOperationFailed();
       showCurrentDirectory();
     });
   }
@@ -29,12 +29,14 @@ function add(fileName) {
     stat(filePath, (err) => {
       if (!err) {
         onInputError();
+        showCurrentDirectory();
       } else {
         writeFile(filePath, '', 'utf8', () => {
+          onOperationFailed();
+          showCurrentDirectory();
         });
       }
     });
-    showCurrentDirectory();
   }
 }
 
@@ -42,20 +44,14 @@ function rn(data) {
   const paths = data?.split(' ');
   if (paths?.length !== 2) {
     onInputError();
+    showCurrentDirectory();
   } else {
     const [path, newFileName] = paths;
     const dirName = dirname(path);
     const newPath = resolve(dirName, newFileName);
-    stat(path, (err) => {
-      // todo: change console logs
-      if (err) console.log('Wrong input Wrong path');
-      stat(newPath, (err) => {
-        if (!err) console.log('Wrong input New path exists');
-        rename(path, newPath, (err) => {
-          if (err) console.log('Wrong input Rename problem');
-          showCurrentDirectory();
-        });
-      });
+    rename(path, newPath, (err) => {
+      if (err) onOperationFailed();
+      showCurrentDirectory();
     });
   }
 }
@@ -64,6 +60,7 @@ function cp(data) {
   const paths = data?.split(' ');
   if (paths?.length !== 2) {
     onInputError();
+    showCurrentDirectory();
   } else {
     copyFile({ paths });
   }
@@ -73,6 +70,7 @@ function mv(data) {
   const paths = data?.split(' ');
   if (paths?.length !== 2) {
     onInputError();
+    showCurrentDirectory();
   } else {
     copyFile({ paths, remove: true });
   }
@@ -96,7 +94,7 @@ function copyFile({ paths, remove }) {
     showCurrentDirectory();
   });
   writeStream.on('error', () => {
-    onOperationFailed()
+    onOperationFailed();
     showCurrentDirectory();
   });
 
@@ -115,17 +113,11 @@ function copyFile({ paths, remove }) {
 function rm(path) {
   if (!path || path.includes(' ')) {
     onInputError();
+    showCurrentDirectory();
   } else {
-    stat(path, (err) => {
-      if (err) {
-        onOperationFailed()
-        showCurrentDirectory();
-      } else {
-        rem(path, (err) => {
-          if (err) onOperationFailed();
-          showCurrentDirectory();
-        });
-      }
+    rem(path, (err) => {
+      if (err) onOperationFailed();
+      showCurrentDirectory();
     });
   }
 }
