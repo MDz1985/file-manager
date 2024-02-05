@@ -10,7 +10,7 @@ export function checkInputData(data) {
       return false;
     }
     if (i === commands.size - 1) {
-      console.log('Invalid input');
+      onInputError();
       showCurrentDirectory();
     }
     return true;
@@ -42,3 +42,11 @@ export const sort = (a, b) => {
   if (first > second) return 1;
   return 0;
 };
+
+export function onInputError() {
+  console.log('Invalid input');
+}
+
+export function onOperationFailed() {
+  console.log('Operation failed');
+}
