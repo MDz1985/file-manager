@@ -1,11 +1,11 @@
-import { createReadStream, createWriteStream, rename, stat, writeFile, rm as rem } from "node:fs";
-import { showCurrentDirectory } from "../services/file-manager-service.js";
-import { basename, dirname, resolve } from "node:path";
-import { cwd } from "node:process";
+import { createReadStream, createWriteStream, rename, stat, writeFile, rm as rem } from 'node:fs';
+import { onInputError, showCurrentDirectory } from '../services/file-manager-service.js';
+import { basename, dirname, resolve } from 'node:path';
+import { cwd } from 'node:process';
 
 function cat(path) {
   if (!path || path.includes(' ')) {
-    console.log('Wrong input')
+    onInputError();
   } else {
     const readStream = createReadStream(path, 'utf-8');
     let data = '';
@@ -15,7 +15,7 @@ function cat(path) {
       showCurrentDirectory();
     });
     readStream.on('error', () => {
-      console.log('Input error');
+      onInputError();
       showCurrentDirectory();
     });
   }
@@ -23,14 +23,17 @@ function cat(path) {
 
 function add(fileName) {
   if (!fileName || fileName.includes(' ')) {
-    console.log('Wrong input')
+    onInputError();
   } else {
     const filePath = resolve(cwd(), fileName);
     stat(filePath, (err) => {
-      if (!err) console.log('Wrong input');
-      writeFile(filePath, '', 'utf8', () => {
-      })
-    })
+      if (!err) {
+        onInputError();
+      } else {
+        writeFile(filePath, '', 'utf8', () => {
+        });
+      }
+    });
     showCurrentDirectory();
   }
 }
@@ -38,7 +41,7 @@ function add(fileName) {
 function rn(data) {
   const paths = data?.split(' ');
   if (paths?.length !== 2) {
-    console.log('Wrong input')
+    onInputError();
   } else {
     const [path, newFileName] = paths;
     const dirName = dirname(path);
@@ -51,16 +54,16 @@ function rn(data) {
         rename(path, newPath, (err) => {
           if (err) console.log('Wrong input Rename problem');
           showCurrentDirectory();
-        })
-      })
-    })
+        });
+      });
+    });
   }
 }
 
 function cp(data) {
   const paths = data?.split(' ');
   if (paths?.length !== 2) {
-    console.log('Wrong input')
+    onInputError();
   } else {
     copyFile({ paths });
   }
@@ -69,7 +72,7 @@ function cp(data) {
 function mv(data) {
   const paths = data?.split(' ');
   if (paths?.length !== 2) {
-    console.log('Wrong input')
+    onInputError();
   } else {
     copyFile({ paths, remove: true });
   }
@@ -95,33 +98,33 @@ function copyFile({ paths, remove }) {
   writeStream.on('error', (err) => {
     console.log('Wrong input write problem', err.message);
     showCurrentDirectory();
-  })
+  });
 
   writeStream.on('finish', () => {
     if (remove) {
       rem(path, (err) => {
-        if (err) console.log(err)
-      })
+        if (err) console.log(err);
+      });
     }
-    showCurrentDirectory()
-  })
+    showCurrentDirectory();
+  });
 }
 
 function rm(path) {
   if (!path || path.includes(' ')) {
-    console.log('Wrong input')
+    onInputError();
   } else {
     stat(path, (err) => {
       if (err) {
-        console.log('Wrong input')
+        onInputError();
       } else {
         rem(path, (err) => {
-          if (err) console.log('Wrong input')
-        })
+          if (err) onInputError();
+        });
       }
-      showCurrentDirectory()
-    })
+      showCurrentDirectory();
+    });
   }
 }
 
-export const fileOperations = { cat, add, rn, rm, mv, cp }
+export const fileOperations = { cat, add, rn, rm, mv, cp };

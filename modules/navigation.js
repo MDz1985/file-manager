@@ -1,5 +1,5 @@
 import { chdir, cwd } from "node:process";
-import { showCurrentDirectory, sort } from "../services/file-manager-service.js";
+import { onInputError, showCurrentDirectory, sort } from '../services/file-manager-service.js';
 import { readdir, stat } from "node:fs";
 import { resolve } from "node:path";
 
@@ -10,12 +10,12 @@ function up() {
 
 function cd(path) {
   if (!path || path.includes(' ')) {
-    console.log('Wrong input')
+    onInputError();
   } else {
     try {
       chdir(path);
     } catch {
-      console.log('Wrong input')
+      onInputError();
     }
     showCurrentDirectory();
   }
