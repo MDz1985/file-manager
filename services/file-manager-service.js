@@ -22,7 +22,7 @@ export function checkInput(username) {
     if (/\.exit[\n\r]/.test(data.toString().toLowerCase())) {
       process.exit();
     }
-    checkInputData(data.slice(0, -1));
+    checkInputData(data.slice(0, -os.EOL.length));
   });
   process.on('exit', () => console.log(`Thank you for using File Manager, ${ username }, goodbye!`));
   process.on('SIGINT', () => {
