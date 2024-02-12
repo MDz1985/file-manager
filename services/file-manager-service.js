@@ -1,5 +1,6 @@
 import { commands } from '../modules/commands.js';
 import { stdin } from 'node:process';
+import * as os from 'node:os';
 
 export function checkInputData(data) {
   [...commands.entries()].every(([func, regex], i) => {
